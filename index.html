@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarketHub — سوق الحسابات الرقمية</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+<div class="container nav">
+<a class="logo" href="index.html">Market<span>Hub</span></a>
+<nav>
+<a class="active" href="index.html">الرئيسية</a>
+<a href="#categories">المنصات</a>
+<a href="#listings">الحسابات</a>
+<a href="sell.html">بيع حساب</a>
+</nav>
+<div class="nav-actions" id="navActions">
+<a class="btn ghost" href="login.html">تسجيل الدخول</a>
+<a class="btn primary" href="register.html">إنشاء حساب</a>
+</div>
+</div>
+</header>
+<main>
+<section class="hero">
+<div class="container hero-grid"><div>
+<span class="eyebrow">منصة رقمية متخصصة</span>
+<h1>اشترِ وبِع الحسابات الرقمية <span>بسهولة</span></h1>
+<p>سوق منظم للحسابات الرقمية مع مراجعة للعروض ونظام طلبات وتقييمات ودعم للمستخدمين.</p>
+<div class="hero-actions"><a class="btn primary big" href="#listings">تصفح الحسابات</a><a class="btn dark big" href="sell.html">اعرض حسابك للبيع</a></div>
+<div class="stats"><div><b>1,250+</b><small>عرضًا</small></div><div><b>8</b><small>منصات</small></div><div><b>24/7</b><small>دعم</small></div></div>
+</div>
+<div class="hero-card"><div class="mock-window"><div class="mock-head"><span></span><span></span><span></span></div><div class="mock-content"><div class="mock-title">أحدث العروض</div><div class="mock-row"><i class="ig">◎</i><div><b>Instagram</b><small>18.4K متابع</small></div><strong>$120</strong></div><div class="mock-row"><i class="yt">▶</i><div><b>YouTube</b><small>42K مشترك</small></div><strong>$390</strong></div><div class="mock-row"><i class="tt">♪</i><div><b>TikTok</b><small>75K متابع</small></div><strong>$260</strong></div></div></div></div>
+</div>
+</section>
+<section id="categories" class="section"><div class="container"><div class="section-head"><div><span class="eyebrow">تصفح حسب المنصة</span><h2>اختر المنصة</h2></div></div><div class="platforms">
+<a href="#listings" data-filter="Instagram" class="platform-card"><b class="icon ig">◎</b><strong>Instagram</strong><small>حسابات وصناع محتوى</small></a>
+<a href="#listings" data-filter="Facebook" class="platform-card"><b class="icon fb">f</b><strong>Facebook</strong><small>صفحات ومجتمعات</small></a>
+<a href="#listings" data-filter="TikTok" class="platform-card"><b class="icon tt">♪</b><strong>TikTok</strong><small>حسابات ومحتوى</small></a>
+<a href="#listings" data-filter="YouTube" class="platform-card"><b class="icon yt">▶</b><strong>YouTube</strong><small>قنوات ومشاريع</small></a>
+<a href="#listings" data-filter="Telegram" class="platform-card"><b class="icon tg">➤</b><strong>Telegram</strong><small>قنوات ومجموعات</small></a>
+<a href="#listings" data-filter="X" class="platform-card"><b class="icon x">𝕏</b><strong>X</strong><small>حسابات ومجتمعات</small></a>
+</div></div></section>
+<section id="listings" class="section light"><div class="container"><div class="section-head"><div><span class="eyebrow">Marketplace</span><h2>أحدث الحسابات</h2></div><div class="filters"><select id="platformFilter"><option value="">كل المنصات</option><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Telegram</option><option>X</option></select><select id="sortFilter"><option value="new">الأحدث</option><option value="low">الأقل سعرًا</option><option value="high">الأعلى سعرًا</option></select></div></div><div id="listingGrid" class="cards"></div></div></section>
+</main>
+<footer><div class="container footer"><b>MarketHub</b><span>منصة بيع وشراء الحسابات الرقمية</span><span>© 2026</span></div></footer>
+<script src="app.js"></script>
+<script type="module">
+import {{ initializeApp }} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {{ getAuth,onAuthStateChanged,signOut }} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+{firebase}
+const auth=getAuth(initializeApp(firebaseConfig));
+const actions=document.getElementById("navActions");
+onAuthStateChanged(auth,user=>{{
+ if(user){{
+  actions.innerHTML='<span style="margin-left:10px">مرحبًا '+(user.displayName||user.email)+'</span><button id="logoutBtn" class="btn ghost" type="button">تسجيل الخروج</button>';
+  document.getElementById("logoutBtn").onclick=async()=>{{await signOut(auth);window.location.reload();}};
+ }}
+}});
+</script>
+</body>
+</html>
