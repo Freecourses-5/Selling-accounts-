@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل الدخول - MarketHub</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="container nav"><a class="logo" href="index.html">Market<span>Hub</span></a></div></header>
+<main class="form-page">
+<div class="form-card">
+<span class="eyebrow">Account</span>
+<h1>تسجيل الدخول</h1>
+<form id="loginForm">
+<div class="field"><label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="email" required></div>
+<div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required></div>
+<button id="loginBtn" class="btn primary" style="width:100%" type="submit">تسجيل الدخول</button>
+<p id="message" style="margin-top:12px"></p>
+</form>
+<p>ليس لديك حساب؟ <a href="register.html" style="color:#635bff">إنشاء حساب</a></p>
+</div>
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence }
+from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDFVBBCpwx_afmIvpvs7rJscYXEYO2qrYk",
+  authDomain: "markethub-84d49.firebaseapp.com",
+  projectId: "markethub-84d49",
+  storageBucket: "markethub-84d49.firebasestorage.app",
+  messagingSenderId: "333098836937",
+  appId: "1:333098836937:web:a4ec75dc26fd51a8e37e18",
+  measurementId: "G-R6XLKWQM9G"
+};
+const auth = getAuth(initializeApp(firebaseConfig));
+const form=document.getElementById("loginForm"), btn=document.getElementById("loginBtn"), msg=document.getElementById("message");
+let redirecting=false;
+onAuthStateChanged(auth,user=>{
+  if(user && redirecting===false) {
+    // Existing sessions are handled only when the user explicitly opens login.
+    // Do not redirect automatically.
+  }
+});
+form.addEventListener("submit",async e=>{
+ e.preventDefault();
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ if(!email||!password){msg.textContent="اكتب البريد الإلكتروني وكلمة المرور.";return;}
+ btn.disabled=true; btn.textContent="جاري تسجيل الدخول..."; msg.textContent="";
+ try{
+   await setPersistence(auth,browserLocalPersistence);
+   await signInWithEmailAndPassword(auth,email,password);
+   redirecting=true;
+   msg.textContent="تم تسجيل الدخول بنجاح...";
+   msg.style.color="green";
+   window.location.replace("index.html");
+ }catch(error){
+   const m={
+    "auth/invalid-credential":"البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    "auth/user-not-found":"لا يوجد حساب بهذا البريد الإلكتروني.",
+    "auth/wrong-password":"كلمة المرور غير صحيحة.",
+    "auth/invalid-email":"البريد الإلكتروني غير صالح.",
+    "auth/too-many-requests":"تمت محاولات كثيرة. حاول مرة أخرى لاحقًا.",
+    "auth/unauthorized-domain":"نطاق الموقع غير مضاف إلى Authorized domains في Firebase.",
+    "auth/operation-not-allowed":"تسجيل الدخول بالبريد الإلكتروني غير مفعّل في Firebase."
+   };
+   msg.textContent=m[error.code]||("حدث خطأ: "+error.code);
+   msg.style.color="#d33"; btn.disabled=false; btn.textContent="تسجيل الدخول";
+ }
+});
+</script>
+</body>
+</html>
