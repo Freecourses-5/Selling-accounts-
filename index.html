@@ -15,6 +15,7 @@
 <a href="#categories">المنصات</a>
 <a href="#listings">الحسابات</a>
 <a href="sell.html">بيع حساب</a>
+<a href="subscription.html">الاشتراك</a>
 </nav>
 <div class="nav-actions" id="navActions">
 <a class="btn ghost" href="login.html">تسجيل الدخول</a>
@@ -62,8 +63,9 @@ const auth=getAuth(initializeApp(firebaseConfig));
 const actions=document.getElementById("navActions");
 onAuthStateChanged(auth,user=>{
  if(user){
-  actions.innerHTML='<span style="margin-left:10px">مرحبًا '+(user.displayName||user.email)+'</span><button id="logoutBtn" class="btn ghost" type="button">تسجيل الخروج</button>';
-  document.getElementById("logoutBtn").onclick=async()=>{await signOut(auth);window.location.reload();};
+  actions.innerHTML='<span style="margin-left:10px">مرحبًا '+(user.displayName||user.email)+'</span><a class="btn ghost" href="account.html">إعدادات الحساب</a>';
+ } else {
+  actions.innerHTML='<a class="btn ghost" href="login.html">تسجيل الدخول</a><a class="btn primary" href="register.html">إنشاء حساب</a>';
  }
 });
 </script>
