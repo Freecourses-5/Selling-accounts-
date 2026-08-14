@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>إعدادات الحساب - MarketHub</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+<div class="container nav">
+<a class="logo" href="index.html">Market<span>Hub</span></a>
+<nav>
+<a href="index.html">الرئيسية</a>
+<a href="index.html#categories">المنصات</a>
+<a href="index.html#listings">الحسابات</a>
+<a href="sell.html">بيع حساب</a>
+</nav>
+<div class="nav-actions" id="navActions"></div>
+</div>
+</header>
+<main class="form-page">
+<div class="form-card" style="max-width:520px">
+<span class="eyebrow">Account Settings</span>
+<h1>إعدادات الحساب</h1>
+
+<div id="guest" style="display:none">
+<p>لازم تسجل دخول الأول عشان توصل للصفحة دي.</p>
+<a class="btn primary" href="login.html">تسجيل الدخول</a>
+</div>
+
+<div id="content" style="display:none">
+
+<div class="field" style="margin-bottom:22px">
+<label>البريد الإلكتروني</label>
+<input id="emailDisplay" disabled>
+</div>
+
+<form id="nameForm">
+<div class="field"><label for="name">الاسم</label><input id="name" required></div>
+<button class="btn primary" type="submit">حفظ الاسم</button>
+<p id="nameMsg" style="margin-top:10px"></p>
+</form>
+
+<hr style="margin:28px 0;border:none;border-top:1px solid #eee">
+
+<form id="passForm">
+<div class="field"><label for="currentPassword">كلمة المرور الحالية</label><input id="currentPassword" type="password" required></div>
+<div class="field"><label for="newPassword">كلمة المرور الجديدة</label><input id="newPassword" type="password" minlength="8" required></div>
+<button class="btn primary" type="submit">تغيير كلمة المرور</button>
+<p id="passMsg" style="margin-top:10px"></p>
+</form>
+
+<hr style="margin:28px 0;border:none;border-top:1px solid #eee">
+
+<button id="logoutBtn" class="btn dark" style="width:100%" type="button">تسجيل الخروج</button>
+
+</div>
+</div>
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut, updateProfile,
+  reauthenticateWithCredential, EmailAuthProvider, updatePassword
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDFVBBCpwx_afmIvpvs7rJscYXEYO2qrYk",
+  authDomain: "markethub-84d49.firebaseapp.com",
+  projectId: "markethub-84d49",
+  storageBucket: "markethub-84d49.firebasestorage.app",
+  messagingSenderId: "333098836937",
+  appId: "1:333098836937:web:a4ec75dc26fd51a8e37e18",
+  measurementId: "G-R6XLKWQM9G"
+};
+const auth = getAuth(initializeApp(firebaseConfig));
+const navActions = document.getElementById("navActions");
+const guestBox = document.getElementById("guest");
+const contentBox = document.getElementById("content");
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    navActions.innerHTML = '<span class="welcome-text">مرحبًا ' + (user.displayName || user.email) + '</span><a class="btn account-link" href="account.html">إعدادات الحساب</a>';
+    guestBox.style.display = "none";
+    contentBox.style.display = "block";
+    document.getElementById("emailDisplay").value = user.email;
+    document.getElementById("name").value = user.displayName || "";
+  } else {
+    navActions.innerHTML = '<a class="btn ghost" href="login.html">تسجيل الدخول</a><a class="btn primary" href="register.html">إنشاء حساب</a>';
+    guestBox.style.display = "block";
+    contentBox.style.display = "none";
+  }
+});
+
+document.getElementById("nameForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const nameMsg = document.getElementById("nameMsg");
+  const newName = document.getElementById("name").value.trim();
+  nameMsg.style.color = "";
+  nameMsg.textContent = "جارِ الحفظ...";
+  try {
+    await updateProfile(auth.currentUser, { displayName: newName });
+    nameMsg.style.color = "#1a9c4b";
+    nameMsg.textContent = "تم حفظ الاسم بنجاح.";
+    document.getElementById("navActions").querySelector("span").textContent = "مرحبًا " + newName;
+  } catch (error) {
+    nameMsg.style.color = "#d33";
+    nameMsg.textContent = "حدث خطأ: " + error.code;
+  }
+});
+
+document.getElementById("passForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const passMsg = document.getElementById("passMsg");
+  const currentPassword = document.getElementById("currentPassword").value;
+  const newPassword = document.getElementById("newPassword").value;
+  passMsg.style.color = "";
+  passMsg.textContent = "جارِ التحديث...";
+  try {
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    await updatePassword(auth.currentUser, newPassword);
+    passMsg.style.color = "#1a9c4b";
+    passMsg.textContent = "تم تغيير كلمة المرور بنجاح.";
+    e.target.reset();
+  } catch (error) {
+    const m = {
+      "auth/wrong-password": "كلمة المرور الحالية غير صحيحة.",
+      "auth/weak-password": "كلمة المرور الجديدة ضعيفة. استخدم 8 أحرف على الأقل.",
+      "auth/too-many-requests": "محاولات كثيرة، حاول لاحقًا."
+    };
+    passMsg.style.color = "#d33";
+    passMsg.textContent = m[error.code] || ("حدث خطأ: " + error.code);
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
+});
+</script>
+</body>
+</html>
